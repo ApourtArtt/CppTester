@@ -1,6 +1,6 @@
 # CppTester
 
-Header-only simple unit tester for C++.
+Header-only simple unit tester for C++. Works only with C++20, GCC 11+, Clang 12+ and MSVC 19+ are supported. The latter requires to add a flag to enable the new preprocessor handler (`/experimental:preprocessor `), since the current one is buggy. 
 
 ## Why ?
 I don't know if I am too stupid or what, but I found making unit testing in C++ was a pain, so I wrote this.
