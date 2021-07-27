@@ -1,34 +1,72 @@
 #include <iostream>
 #include <vector>
 #include <functional>
-#include <stdio.h>
 #include <tuple>
 #include <source_location>
+#include <chrono>
 
-struct ret
+struct testRet
 {
-    std::vector<std::tuple<std::string, bool, std::string>> statements; // subtitle, status, location
+    std::vector<std::tuple<std::string, bool, std::string>> statements;
     void AddStatement(std::string Title, bool Status, std::string location)
         { statements.push_back({Title, Status, location}); }
 };
 
+struct benchRet
+{
+    int counter;
+};
+
 struct registrar {
-    struct entity {
+    struct testEntity {
         std::string title, subTitle;
-        std::function<ret()> func;
-        entity(std::string Title, std::string SubTitle, std::function<ret()> Func)
+        std::function<testRet()> func;
+        testEntity(std::string Title, std::string SubTitle, std::function<testRet()> Func)
+            : title(std::move(Title)), subTitle(std::move(SubTitle)), func(Func)
+        {}
+    };
+    struct benchEntity {
+        std::string title, subTitle;
+        std::function<benchRet()> func;
+        benchEntity(std::string Title, std::string SubTitle, std::function<benchRet()> Func)
             : title(std::move(Title)), subTitle(std::move(SubTitle)), func(Func)
         {}
     };
 
-    inline static std::vector<entity> testers;
-    registrar(std::string Title, std::string SubTitle, std::function<ret()> Func, bool IsTest) {
-        testers.push_back(entity(std::move(Title), std::move(SubTitle), Func));
+    inline static std::vector<testEntity> testers;
+    registrar(std::string Title, std::string SubTitle, std::function<testRet()> Func) {
+        testers.push_back(testEntity(std::move(Title), std::move(SubTitle), Func));
+    }
+    inline static std::vector<benchEntity> benchers;
+    registrar(std::string Title, std::string SubTitle, std::function<benchRet()> Func) {
+        benchers.push_back(benchEntity(std::move(Title), std::move(SubTitle), Func));
     }
 };
 
-#define TESTER(name,message,func) registrar r(name, message, []()->ret{ret r; func return r;}, true);
+#define TESTER(name,message,func) registrar testR(name, message, []()->testRet{testRet r; func return r;});
 #define TEST(...) TESTER(__VA_ARGS__)
+
+#define BENCHER(name, message, func) registrar benchR(name, message, []()->benchRet{benchRet r; func return r;});
+#define BENCH(...) BENCHER(__VA_ARGS__)
+
+/*
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+*/
+#define START_BENCH \
+    auto t1 = std::chrono::high_resolution_clock::now(); \
+    auto t2 = std::chrono::high_resolution_clock::now(); \
+    while (duration_cast<std::chrono::milliseconds>(t2-t1).count() < 1000) {
+
+
+#define STOP_BENCH \
+        t2 = std::chrono::high_resolution_clock::now(); \
+        r.counter++; \
+    }
+
+    
 
 #define GET_LOCATION __FILE__ + std::string(":") + std::to_string(__LINE__)
 
@@ -49,15 +87,24 @@ namespace Tester
         for (auto& fn: registrar::testers)
         {
             std::cout << "Starting to test: " << fn.title << " - " << fn.subTitle << std::endl;
-            ret r = fn.func();
+            testRet r = fn.func();
             for (auto& test: r.statements)
             {
-                auto [ subTitle, status, location ] = test;
+                auto [subTitle, status, location] = test;
                 if (status)
-                    std::cout << "\t" << subTitle << " : passed" << std::endl;
+                    std::cout << "\t" << subTitle << ": Passed" << std::endl;
                 else
-                    std::cout << "\t" << subTitle << " : failed (" << location << ")" << std::endl;
+                    std::cout << "\t" << subTitle << ": Failed (" << location << ")" << std::endl;
             }
+        }
+
+        std::cout << std::endl;
+
+        for (auto& fn: registrar::benchers)
+        {
+            std::cout << "Starting to benchmark: " << fn.title << " - " << fn.subTitle << "...\t";
+            benchRet r = fn.func();
+            std::cout << r.counter << " iteration/s" << std::endl;
         }
     }
 }
@@ -72,6 +119,13 @@ TEST("BiduleTest", "Tests some additions",
     ASSERT("Is 6+6 equal to 12", Bidule(6, 6)==12) // true
     ASSERT("Is 6+7 equal to 12", Bidule(6, 7)==12) // false, will stop there
     EXPECT("Is 6+8 equal to 14", Bidule(6, 8)==14) // true
+)
+
+BENCH("BiduleBench", "Bench additions",
+    START_BENCH
+    int a = 5; int b = 7;
+    Bidule(a, b);
+    STOP_BENCH
 )
 
 int main(int, char**)
