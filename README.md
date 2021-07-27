@@ -47,7 +47,7 @@ Every tasks are finished
 ```
 
 ### Benchmark
-It can also be interesting to have an idea of the time a function takes, since we're talking about unit test and not integration tests, I choosed to re-iterate again and again while one second did not passed.
+It can also be interesting to have an idea of the time a function takes, since we're talking about unit test and not integration tests, I chose to re-iterate again and again while one second did not passed.
 
 Here is an example, still with Bidule :
 ```cpp
