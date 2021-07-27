@@ -105,7 +105,7 @@ namespace Tester
 
         std::cout << "Tests executed : " << nbTestFailed + nbTestPassed
             << ", Passed: " << nbTestPassed << ", Failed: " << nbTestFailed
-            << ", Ignored: " << registrar::testers.size() << std::endl; // TODO: it works (that's strange) on GCC, check for MSVC
+            << ", Ignored: " << registrar::testers.size() << std::endl;
 
         std::cout << "Starting benchs..." << std::endl;
 
