@@ -6,11 +6,11 @@ Header-only simple unit tester for C++. Works only with C++20, GCC 11+, Clang 12
 I don't know if I am too stupid or what, but I found making unit testing in C++ was a pain, so I wrote this.
 
 ## How to use ?
-There are two kinds of tests :
+There are two features :
 1) `TEST("What the test is related to", "What the test does", the_code)` : it tests the function based on what `the_code` is. There are two types of tests :
-      - ASSERT("What the sub-test is about", the_statement) : if it passes, cool. If it failes, the test is stopped.
-      - EXPECT("What the sub-test is about", the_statement) : if it passes, cool. If it failes, not cool. But it continues.
-2) `BENCH("What the bench is related to", "What the bench... marks", the_code)` : it gives the number of iteration the code between `START_BENCH` and `STOP_BENCH ` does in a second.
+      - ASSERT("What the sub-test is about", the_statement) : if it passes, cool. If it fails, the test is stopped.
+      - EXPECT("What the sub-test is about", the_statement) : if it passes, cool. If it fails, not cool. But it continues.
+2) `BENCH("What the bench is related to", "What the bench... marks", the_code)` : it gives the number of iteration the code between `START_BENCH` and `STOP_BENCH` does in a second.
 
 ## Example
 Imagine we have an ultra complicated function named Bidule, such as it takes two inputs, `a` and `b`, adds them and return the value :
