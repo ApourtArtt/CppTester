@@ -1,8 +1,8 @@
+#include <string>
 #include <iostream>
 #include <vector>
 #include <functional>
 #include <tuple>
-#include <source_location>
 #include <chrono>
 
 struct testRet
@@ -14,7 +14,7 @@ struct testRet
 
 struct benchRet
 {
-    int counter;
+    int counter = 0;
 };
 
 struct registrar {
@@ -43,29 +43,29 @@ struct registrar {
     }
 };
 
-#define TESTER(name,message,func) registrar testR(name, message, []()->testRet{testRet r; func return r;});
-#define TEST(...) TESTER(__VA_ARGS__)
+#define AA_TESTER(name,message,func) registrar testR(name, message, []() -> testRet {testRet r; func return r;});
+#define AA_TEST(...) AA_TESTER(__VA_ARGS__)
 
-#define BENCHER(name, message, func) registrar benchR(name, message, []()->benchRet{benchRet r; func return r;});
-#define BENCH(...) BENCHER(__VA_ARGS__)
+#define AA_BENCHER(name, message, func) registrar benchR(name, message, []() -> benchRet{benchRet r; func return r;});
+#define AA_BENCH(...) AA_BENCHER(__VA_ARGS__)
 
-#define START_BENCH \
+#define AA_START_BENCH \
     auto t1 = std::chrono::high_resolution_clock::now(); \
     auto t2 = std::chrono::high_resolution_clock::now(); \
     while (duration_cast<std::chrono::milliseconds>(t2-t1).count() < 1000) {
 
-#define STOP_BENCH \
+#define AA_STOP_BENCH \
         t2 = std::chrono::high_resolution_clock::now(); \
         r.counter++; \
     }
 
 #define GET_LOCATION __FILE__ + std::string(":") + std::to_string(__LINE__)
 
-#define EXPECTER(title, statement) r.AddStatement(std::string("[EXPECT] ")+title, statement, GET_LOCATION);
-#define EXPECT(...) EXPECTER(__VA_ARGS__)
+#define AA_EXPECTER(title, statement) r.AddStatement(std::string("[EXPECT] ")+title, statement, GET_LOCATION);
+#define AA_EXPECT(...) AA_EXPECTER(__VA_ARGS__)
 
-#define ASSERTER(title, statement) r.AddStatement(std::string("[ASSERT] ")+title, statement, GET_LOCATION); if (statement == false) return r;
-#define ASSERT(...) ASSERTER(__VA_ARGS__)
+#define AA_ASSERTER(title, statement) r.AddStatement(std::string("[ASSERT] ")+title, statement, GET_LOCATION); if (statement == false) return r;
+#define AA_ASSERT(...) AA_ASSERTER(__VA_ARGS__)
 
 namespace Tester
 {
@@ -121,18 +121,17 @@ int Bidule(int a, int b)
     return a + b;
 }
 
-TEST("BiduleTest", "Tests some additions",
-    EXPECT("Is 6+7 equal to 12", Bidule(6, 7) == 12) // failed
-    ASSERT("Is 6+6 equal to 12", Bidule(6, 6) == 12) // passed
-    ASSERT("Is 6+7 equal to 12", Bidule(6, 7) == 12) // failed, will stop there
-    EXPECT("Is 6+8 equal to 14", Bidule(6, 8) == 14) // ignored
+AA_TEST("BiduleTest", "Tests some additions",
+    AA_EXPECT("Is 6+7 equal to 12", Bidule(6, 7) == 12) // failed
+    AA_ASSERT("Is 6+6 equal to 12", Bidule(6, 6) == 12) // passed
+    AA_ASSERT("Is 6+7 equal to 12", Bidule(6, 7) == 12) // failed, will stop there
+    AA_EXPECT("Is 6+8 equal to 14", Bidule(6, 8) == 14) // ignored
 )
 
-BENCH("BiduleBench", "Bench additions",
-    int a = 5; int b = 7;
-    START_BENCH
+AA_BENCH("BiduleBench", "Bench additions", int a = 5; int b = 7;
+    AA_START_BENCH;
     Bidule(a, b);
-    STOP_BENCH
+    AA_STOP_BENCH;
 )
 
 int main(int, char**)
