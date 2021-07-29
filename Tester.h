@@ -55,7 +55,6 @@ namespace
 #define ASSERTER(title, statement) r.AddStatement(std::string("[ASSERT] ")+title, statement, GET_LOCATION); if (statement == false) return r;
 }
 
-
 #define TEST(...) TESTER(__VA_ARGS__)
 #define BENCH(...) BENCHER(__VA_ARGS__)
 #define EXPECT(...) EXPECTER(__VA_ARGS__)
@@ -80,32 +79,39 @@ namespace Tester
         hasRan = true;
 
         int nbTestFailed = 0, nbTestPassed = 0;
+        int nbBigTestFailed = 0;
 
         std::cout << "Starting tests..." << std::endl;
 
         for (auto& fn : registrar::testers)
         {
+            bool success = true;
             std::cout << "Starting to test: " << fn.title << " - " << fn.subTitle << std::endl;
             testRet r = fn.func();
+
             for (auto& test : r.statements)
             {
                 auto [subTitle, status, location] = test;
                 if (status)
                 {
-                    std::cout << "\t" << subTitle << ": Passed" << std::endl;
+                    std::cout << "    " << subTitle << ": Passed" << std::endl;
                     nbTestPassed++;
                 }
                 else
                 {
-                    std::cout << "\t" << subTitle << ": Failed (" << location << ")" << std::endl;
+                    std::cout << "    " << subTitle << ": Failed (" << location << ")" << std::endl;
                     nbTestFailed++;
+                    success = false;
                 }
             }
+
+            nbBigTestFailed += !success;
         }
 
-        std::cout << "Tests executed : " << nbTestFailed + nbTestPassed
-            << ", Passed: " << nbTestPassed << ", Failed: " << nbTestFailed
-            << ", Ignored: " << registrar::testers.size() << std::endl;
+        std::cout << "Tests executed:\t\t" << registrar::testers.size()
+            << " (Passed: " << registrar::testers.size() - nbBigTestFailed << ", Failed: " << nbBigTestFailed << ')'
+            << "\nStatements executed:\t" << nbTestFailed + nbTestPassed
+            << " (Passed: " << nbTestPassed << ", Failed: " << nbTestFailed << ')' << std::endl;
 
         std::cout << "Starting benchs..." << std::endl;
 
@@ -116,6 +122,6 @@ namespace Tester
             std::cout << r.counter << " iteration/s" << std::endl;
         }
 
-        std::cout << "Benchs executed\nEvery tasks are finished" << std::endl;
+        std::cout << "Benchs executed\n\nEvery tasks are finished" << std::endl;
     }
 }
