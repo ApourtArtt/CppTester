@@ -21,5 +21,5 @@ BENCH("BiduleBench", "Bench additions",
 
 int main(int, char**)
 {
-    Tester::Run();
+    return Tester::Run();
 }
