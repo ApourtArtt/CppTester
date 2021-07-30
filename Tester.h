@@ -77,10 +77,10 @@ namespace
 
 namespace Tester
 {
-    static void Run()
+    int Run()
     {
         static bool hasRan = false;
-        if (hasRan) return;
+        if (hasRan) return -1;
         hasRan = true;
 
         int nbTestFailed = 0, nbTestPassed = 0;
@@ -99,12 +99,12 @@ namespace Tester
                 auto [subTitle, status, location] = test;
                 if (status)
                 {
-                    std::cout << "    " << subTitle << ": Passed" << std::endl;
+                    std::cout << "    \033[36mPassed:\033[0m " << subTitle << std::endl;
                     nbTestPassed++;
                 }
                 else
                 {
-                    std::cout << "    " << subTitle << ": Failed (" << location << ")" << std::endl;
+                    std::cout << "    \033[31mFailed:\033[0m " << subTitle << " (" << location << ")" << std::endl;
                     nbTestFailed++;
                     success = false;
                 }
@@ -118,7 +118,7 @@ namespace Tester
             << "\nStatements executed:\t" << nbTestFailed + nbTestPassed
             << " (Passed: " << nbTestPassed << ", Failed: " << nbTestFailed << ')' << std::endl;
 
-        std::cout << "Starting benchs..." << std::endl;
+        std::cout << "\nStarting benchs..." << std::endl;
 
         for (auto& fn : registrar::benchers)
         {
@@ -128,5 +128,6 @@ namespace Tester
         }
 
         std::cout << "Benchs executed\n\nEvery tasks are finished" << std::endl;
+        return -nbTestFailed;
     }
 }
