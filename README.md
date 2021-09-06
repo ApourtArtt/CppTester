@@ -2,9 +2,6 @@
 
 Header-only simple unit tester for C++. Works only with C++20, GCC 11+, Clang 12+ and MSVC 19+ are supported. The latter requires to add a flag to enable the new preprocessor handler (`/Zc:preprocessor`), since the current one is buggy. 
 
-## Why ?
-I don't know if I am too stupid or what, but I found making unit testing in C++ was a pain, so I wrote this.
-
 ## How to use ?
 There are two features :
 1) `TEST("What the test is related to", "What the test does", the_code)` : it tests the function based on what `the_code` is. There are two types of tests :
